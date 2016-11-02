@@ -3,8 +3,8 @@
     <ul>
       <li class="user" v-for="(user, key) in users" transition>
         <span>{{user.NameProject}} - {{user.status}}</span>
-        <button v-on:click="removeData(user)">X</button>
-        <button @click="editData(user, key)">/</button>
+        <button v-on:click="removeData(user)">Delete</button>
+        <button @click="editData(user, key)">Edit</button>
       </li>
     </ul>
     <div v-show="editMode === true ">
