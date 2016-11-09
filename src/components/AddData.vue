@@ -10,7 +10,7 @@
     <div v-show="editMode === true ">
       <input v-model="edit.NameProject">
       <input v-model="edit.status">
-      <button @click="successEdit(edit)"></button>
+      <button @click="successEdit(edit)">Save</button>
     </div>
     <form id="form" v-on:submit.prevent="addUser">
       <input v-model="newUser.NameProject">
@@ -21,17 +21,16 @@
 </template>
 
 <script>
-var firebase = require('firebase')
-var config = {
-  apiKey: 'AIzaSyDVwE2n3_YH-j5OLm-OJKx18fhkzM50-f4',
-  authDomain: 'assignment-a022c.firebaseapp.com',
-  databaseURL: 'https://assignment-a022c.firebaseio.com',
-  storageBucket: 'assignment-a022c.appspot.com',
-  messagingSenderId: '358496802319'
-}
-firebase.initializeApp(config)
-var Users = firebase.database().ref('users')
+/* globals localStorage, firebase */
 export default {
+  beforeRouteEnter (to, from, next) {
+    let local = JSON.parse(localStorage.getItem('auth'))
+    if (local && local.id) {
+      next()
+    } else {
+      next('/login')
+    }
+  },
   data () {
     return {
       users: [],
@@ -41,22 +40,23 @@ export default {
       },
       editMode: false,
       edit: {},
-      editKey: ''
+      editKey: '',
+      databases: firebase.database().ref('users')
     }
   },
   mounted () {
     let vm = this
-    Users.on('child_added', function (snapshot) {
+    vm.databases.on('child_added', function (snapshot) {
       var item = snapshot.val()
       item.id = snapshot.key
       vm.users.push(item)
     })
-    Users.on('child_removed', function (snapshot) {
+    vm.databases.on('child_removed', function (snapshot) {
       var id = snapshot.key
       let index = vm.users.findIndex(user => user.id === id)
       vm.users.splice(index, 1)
     })
-    Users.on('child_changed', function (snapshot, index) {
+    vm.databases.on('child_changed', function (snapshot, index) {
       let edit = vm.users.findIndex(user => user.id === index)
       vm.users.splice(edit, 1)
       let editValue = snapshot.val()
@@ -80,7 +80,7 @@ export default {
   methods: {
     addUser: function () {
       if (this.isValid) {
-        Users.push(this.newUser)
+        this.databases.push(this.newUser)
         this.newUser.NameProject = ''
         this.newUser.status = ''
       }
@@ -101,7 +101,8 @@ export default {
         id: this.editKey,
         status: edit.status
       }
-      firebase.database().ref('users/' + this.editKey).update(data)
+      let update = this.databases.child(this.editKey)
+      update.update(data)
       this.editKey = ''
       this.edit.NameProject = ''
       this.edit.status = ''
