@@ -103,6 +103,7 @@ export default {
       }
       let update = this.databases.child(this.editKey)
       update.update(data)
+      this.editMode = false
       this.editKey = ''
       this.edit.NameProject = ''
       this.edit.status = ''
