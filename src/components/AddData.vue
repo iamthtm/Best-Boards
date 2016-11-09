@@ -3,14 +3,14 @@
     <ul>
       <li class="user" v-for="(user, key) in users" transition>
         <span>{{user.NameProject}} - {{user.status}}</span>
-        <button v-on:click="removeData(user)">Delete</button>
+        <button v-on:click="removeData(user, key)">Delete</button>
         <button @click="editData(user, key)">Edit</button>
       </li>
     </ul>
     <div v-show="editMode === true ">
       <input v-model="edit.NameProject">
       <input v-model="edit.status">
-      <button @click="successEdit(edit)">Save</button>
+      <button @click="successEdit(edit, edit.id)">Save</button>
     </div>
     <form id="form" v-on:submit.prevent="addUser">
       <input v-model="newUser.NameProject">
@@ -33,7 +33,7 @@ export default {
   },
   data () {
     return {
-      users: [],
+      users: {},
       newUser: {
         NameProject: '',
         status: ''
@@ -46,22 +46,8 @@ export default {
   },
   mounted () {
     let vm = this
-    vm.databases.on('child_added', function (snapshot) {
-      var item = snapshot.val()
-      item.id = snapshot.key
-      vm.users.push(item)
-    })
-    vm.databases.on('child_removed', function (snapshot) {
-      var id = snapshot.key
-      let index = vm.users.findIndex(user => user.id === id)
-      vm.users.splice(index, 1)
-    })
-    vm.databases.on('child_changed', function (snapshot, index) {
-      let edit = vm.users.findIndex(user => user.id === index)
-      vm.users.splice(edit, 1)
-      let editValue = snapshot.val()
-      vm.users.push(editValue)
-      console.log(editValue)
+    vm.databases.on('value', function (snapshot, index) {
+      vm.users = snapshot.val()
     })
   },
   computed: {
@@ -85,13 +71,12 @@ export default {
         this.newUser.status = ''
       }
     },
-    removeData: function (user) {
-      firebase.database().ref('users/' + user.id).remove()
+    removeData: function (user, key) {
+      firebase.database().ref('users/' + key).remove()
     },
     editData: function (user, id) {
-      console.log(user.id)
       this.editMode = true
-      this.editKey = user.id
+      this.editKey = id
       this.edit.NameProject = user.NameProject
       this.edit.status = user.status
     },
