@@ -47,7 +47,7 @@
             <div class="middle-newsletter block"> <!-- JOIN NEWSLETTER (RIGHT-CONTAINER) -->
                 <h2 class="titular">Create Board</h2>
                 <div class="input-container">
-                    <input type="text" v-model="createProject">
+                    <input type="text" v-model="createProject" v-on:keyup.enter="addProject(createProject)">
                 </div>
                 <a class="middle-subscribe button" @click="addProject(createProject)">Create</a>
             </div>
@@ -65,7 +65,7 @@
 </template>
 
 <script>
-/* globals localStorage, firebase */
+/* globals localStorage, firebase, swal */
 export default {
   beforeRouteEnter (to, from, next) {
     let local = JSON.parse(localStorage.getItem('auth'))
@@ -89,17 +89,38 @@ export default {
   methods: {
     addKey () {
       let Vm = this
-      // firebase.database().ref(`users/inboard/user`).orderByChild(`uid`).equalTo(this.local.id).once(`value`, (snapshot) => {
-      //   let objKeys = Object.keys(snapshot.val())
-      //   let updateKey = firebase.database().ref('users/inboard/user').child(objKeys[0])
-      //   updateKey.child(`keyCode`).push(Vm.searchKey)
-      //
-      // })
-      firebase.database().ref(`users/inboard/user`).orderByChild(`keyCode`).equalTo(this.keyCode).once(`value`, (snapshot) => {
-        let acceptVal = Object.keys(snapshot.val())
-        console.log(snapshot.val())
-        let insertAccept = firebase.database().ref('users/inboard/user').child(acceptVal[0])
-        insertAccept.child(`accept`).push({keyCode: Vm.searchKey, status: 'true'})
+      firebase.database().ref(`users/inboard/board`).orderByChild(`keyCode`).equalTo(Vm.searchKey).once(`value`, (snapshot) => {
+        if (snapshot.val() !== null) {
+          let acceptVal = Object.keys(snapshot.val())[0]
+          let adminId = snapshot.val()[acceptVal].uid
+          if (adminId !== Vm.local.id) {
+            // เช็คว่าต้องไม่มี Board นี้อยู่แล้ว
+            firebase.database().ref(`users/inboard/user`).orderByChild(`uid`).equalTo(adminId).once(`value`, (snapshot) => {
+              if (snapshot.val() !== null) {
+                let addKeyAdmin = Object.keys(snapshot.val())[0]
+                let dataTmp = snapshot.val()[addKeyAdmin].accept
+                let checkAccept = Object.keys(dataTmp).map(item => dataTmp[item].keyCode)
+                if (!checkAccept.find((item) => item === Vm.searchKey)) {
+                  firebase.database().ref(`users/inboard/user/${addKeyAdmin}`).child('accept').push({keyCode: Vm.searchKey, uid: Vm.local.id, status: 'true'})
+                }
+              }
+            })
+          } else {
+            // กรณี Board ซ้ำ
+            swal({
+              title: 'มีแล้ว',
+              type: 'warning',
+              showCancelButton: true
+            })
+          }
+        } else {
+          // กรณีหารหัส Board ไม่เจอ
+          swal({
+            title: 'ไม่มีรหัสนี้',
+            type: 'warning',
+            showCancelButton: true
+          })
+        }
       })
     },
     checkTeam (key) {
@@ -115,9 +136,10 @@ export default {
     },
     addProject (name) {
       console.log(name)
+      let Vm = this
       if (this.NameProject !== '') {
         let GenCode = this.code()
-        this.databases.push({NameProject: name, keyCode: GenCode})
+        this.databases.push({NameProject: name, keyCode: GenCode, uid: Vm.local.id})
         firebase.database().ref(`users/inboard/user`).orderByChild(`uid`).equalTo(this.local.id).once(`value`, (snapshot) => {
           let objKeys = Object.keys(snapshot.val())
           let updateKey = firebase.database().ref('users/inboard/user').child(objKeys[0])
@@ -139,18 +161,19 @@ export default {
     // console.log(this)
     let vm = this
     vm.databases.on('value', function (snapshot, index) {
-      vm.project = snapshot.val()
+      if (snapshot.val() !== null) {
+        vm.project = snapshot.val()
+      }
     })
     firebase.database().ref(`users/inboard/user`).orderByChild(`uid`).equalTo(this.local.id).on(`value`, (snapshot) => {
       if (snapshot.val() !== null) {
         vm.meAccount = Object.assign(snapshot.val())
-        // let objKeys = Object.keys(snapshot.val())
-        // let updateKey = firebase.database().ref('users/inboard/user').child(objKeys[0])
-        // updateKey.child(`keyCode`).push(Vm.searchKey)
         let key = Object.keys(vm.meAccount)[0]
         this.arrayKeyCode = Object.keys(vm.meAccount[key].keyCode).map(keys => vm.meAccount[key].keyCode[keys])
-        console.log(snapshot.val())
       }
+    })
+    firebase.database().ref(`users/inboard/user`).child(`accept`).on(`child_changed`, (snapshot) => {
+      console.log(snapshot.val().accept)
     })
   }
 }

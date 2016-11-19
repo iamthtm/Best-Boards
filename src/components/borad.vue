@@ -16,7 +16,7 @@
 </template>
 
 <script>
-/* globals firebase, swal */
+/* globals firebase */
 export default {
   data () {
     return {
@@ -31,11 +31,6 @@ export default {
     vm.boardNow.child('detailboard').on('value', function (snapshot, index) {
       vm.board = snapshot.val()
     })
-    swal(
-      'Oops...',
-      'Something went wrong!',
-      'error'
-    )
   },
   methods: {
     deleteTask (key, keyTask) {

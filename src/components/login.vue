@@ -35,10 +35,8 @@ export default {
         console.log(login)
         if (login.status === 'connected') {
           var token = login.authResponse.accessToken
-          // var uid = login.authResponse.userID
           FB.api('/me?fields=id,name,email,birthday,picture', 'get', {'access_token': token}, (res) => {
-            console.log(res)
-            firebase.database().ref(`users/inboard/user`).orderByChild(`uid`).equalTo(res.id).once(`value`, (snapshot) => {
+            Vm.databases.child(`user`).orderByChild(`uid`).equalTo(res.id).once(`value`, (snapshot) => {
               if (snapshot.val() === null) {
                 Vm.databases.child(`user`).push({uid: res.id, FB_NAME: res.name, FB_EMAIL: res.email, status: `admin`})
               }
