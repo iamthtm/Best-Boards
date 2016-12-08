@@ -12,13 +12,12 @@
       </p>
       <div v-for="(list, keytask) in item.task">
         {{list}} <button @click="deleteTask(key, keytask)">Delete</button>
-        <button @click="deleteTask(key, keytask)">Edit</button>
+        <button @click="updateTask(key, keytask, list)">Edit</button>
       </div>
     </div>
     <button><router-link to="{path: `/`}">backHome</router-link></button>
   </div>
 </template>
-
 <script>
 /* globals firebase, swal */
 export default {
@@ -41,6 +40,24 @@ export default {
     })
   },
   methods: {
+    updateTask (key, keytask, data) {
+      let Vm = this
+      swal({
+        title: 'dasdsad',
+        input: 'textarea',
+        inputValue: data,
+        showCancelButton: true
+      }).then(function (text) {
+        if (text) {
+          swal(text)
+          let updates = {}
+          updates[`users/inboard/board/${Vm.$route.params.keyId}/detailboard/${key}/task/${keytask}`] = text
+          // console.log(firebase.database().ref(`users/inboard/board/${Vm.$route.params.keyId}/detailboard/${key}/task`).child())
+          console.log(updates)
+          firebase.database().ref().update(updates)
+        }
+      })
+    },
     DeleteHeader (key) {
       swal({
         title: 'ยืนยัน',

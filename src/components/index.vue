@@ -198,37 +198,41 @@ export default {
       }
     })
     firebase.database().ref(`users/inboard/user`).on(`child_changed`, (snapshot) => {
-      co(function *() {
-        let valueSort = snapshot.val().accept
-        let arrayIs = []
-        // yield any promise
-        yield Promise.resolve(Object.keys(valueSort).forEach((item) => {
-          console.log(valueSort[item])
-          arrayIs.push(valueSort[item])
-        }))
-        let sortDate = yield Promise.resolve(arrayIs.sort((a, b) => (b.time - a.time)))
-        return sortDate
-      }).then((resoponse) => {
-        if (resoponse[0].uid !== vm.local.id) {
-
-        }
-        console.log(resoponse)
-      }).catch((onerror) => {
-        console.log(onerror)
-      })
-      // console.log(valueSort)
-      if (snapshot.val() && snapshot.val().accept) {
-        swal({
-          title: 'ยืนยัน',
-          type: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, delete it!',
-          cancelButtonText: 'No, cancel!'
+      let keyAdmin = snapshot.val().uid
+      firebase.database().ref(`users/inboard/board`).orderByChild(`keyCode`).equalTo(`${vm.searchKey}`).once(`value`, (snapshots) => {
+        co(function *() {
+          let valueSort = snapshot.val().accept
+          let arrayIs = []
+          // yield any promise
+          yield Promise.resolve(Object.keys(valueSort).forEach((item) => {
+            // console.log(valueSort[item])
+            arrayIs.push(valueSort[item])
+          }))
+          let sortDate = yield Promise.resolve(arrayIs.sort((a, b) => (b.time - a.time)))
+          return sortDate
+        }).then((resoponse) => {
+          console.log(resoponse)
+          if (+keyAdmin === +vm.local.id) {
+            console.log(true)
+            swal({
+              title: 'ยืนยัน',
+              type: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Yes, delete it!',
+              cancelButtonText: 'No, cancel!'
+            }).then((res) => {
+              console.log(resoponse)
+            }).catch((error) => {
+              console.log(error)
+            })
+          }
+          console.log(resoponse)
+        }).catch((onerror) => {
+          console.log(onerror)
         })
-        // console.log(snapshot.key)
-      }
+      })
     })
   }
 }
