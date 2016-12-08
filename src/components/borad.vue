@@ -1,14 +1,18 @@
 <template lang="html">
   <div id="app">
+    <p class="">{{Project.NameProject}}</p>
+    <p class="">{{Project.keyCode}}</p>
     <input type="text" v-model="nameBorad">
     <button @click="createboard(nameBorad)">Create</button>
     <div v-for="(item, key) in board">
       <p>{{item.nameBorad}} {{item.keyCode}}
         <input type="text" v-model="item.tasktmp">
         <button @click="addListTast(key, item.tasktmp)">Add Task</button>
+        <button @click="DeleteHeader(key)">Delete Task</button>
       </p>
       <div v-for="(list, keytask) in item.task">
         {{list}} <button @click="deleteTask(key, keytask)">Delete</button>
+        <button @click="deleteTask(key, keytask)">Edit</button>
       </div>
     </div>
     <button><router-link to="{path: `/`}">backHome</router-link></button>
@@ -16,14 +20,15 @@
 </template>
 
 <script>
-/* globals firebase */
+/* globals firebase, swal */
 export default {
   data () {
     return {
       boardNow: firebase.database().ref(`users/inboard/board/${this.$route.params.keyId}`),
       board: '',
       nameBorad: '',
-      keys: ''
+      keys: '',
+      Project: ''
     }
   },
   mounted () {
@@ -31,10 +36,46 @@ export default {
     vm.boardNow.child('detailboard').on('value', function (snapshot, index) {
       vm.board = snapshot.val()
     })
+    vm.boardNow.on('value', function (snapshot, index) {
+      vm.Project = snapshot.val()
+    })
   },
   methods: {
+    DeleteHeader (key) {
+      swal({
+        title: 'ยืนยัน',
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!'
+      }).then(() => {
+        firebase.database().ref(`users/inboard/board/${this.$route.params.keyId}/detailboard/${key}`).remove()
+        swal({
+          title: 'ลบเรียบร้อย',
+          type: 'success',
+          showCancelButton: true
+        })
+      })
+    },
     deleteTask (key, keyTask) {
-      firebase.database().ref(`users/inboard/board/${this.$route.params.keyId}/detailboard/${key}/task/${keyTask}`).remove()
+      swal({
+        title: 'ยืนยัน',
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!'
+      }).then(() => {
+        firebase.database().ref(`users/inboard/board/${this.$route.params.keyId}/detailboard/${key}/task/${keyTask}`).remove()
+        swal({
+          title: 'ลบเรียบร้อย',
+          type: 'success',
+          showCancelButton: true
+        })
+      })
     },
     createboard (nameBorad) {
       this.boardNow.child('detailboard').push({nameBorad: nameBorad, tasktmp: ''})

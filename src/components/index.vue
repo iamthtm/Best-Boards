@@ -25,7 +25,7 @@
           <div class="profile block"> <!-- PROFILE (MIDDLE-CONTAINER) -->
               <a class="add-button" href="#28"><span class="icon entypo-plus scnd-font-color"></span></a>
               <div class="profile-picture big-profile-picture clear">
-                  <img width="150px" alt="Anne Hathaway picture" :src="local.picture.data.url" >
+                  <img width="150px" alt="Arunne Hathaway picture" :src="local.picture.data.url" >
               </div><!-- end profile-picture big-profile-picture clear -->
               <h1 class="user-name">{{local.name}}</h1>
               <div class="profile-description">
@@ -39,6 +39,7 @@
           <div class="join-newsletter block"> <!-- JOIN NEWSLETTER (RIGHT-CONTAINER) -->
               <h2 class="titular">Project {{list.NameProject}} {{list.keyCode}}</h2>
                <router-link class="subscribe button" :to="{ path: `/board/${key}` }">Board</router-link>
+               <button @click="deleteBorad(key)">Delete Board</button>
           </div>
         </div><!-- end middle-container container -->
 
@@ -66,6 +67,7 @@
 
 <script>
 /* globals localStorage, firebase, swal */
+import co from 'co'
 export default {
   beforeRouteEnter (to, from, next) {
     let local = JSON.parse(localStorage.getItem('auth'))
@@ -87,6 +89,25 @@ export default {
     }
   },
   methods: {
+    deleteBorad (key) {
+      console.log(key)
+      swal({
+        title: 'ยืนยัน',
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!'
+      }).then(() => {
+        firebase.database().ref(`users/inboard/board/${key}`).remove()
+        swal({
+          title: 'ลบเรียบร้อย',
+          type: 'success',
+          showCancelButton: true
+        })
+      })
+    },
     addKey () {
       let Vm = this
       firebase.database().ref(`users/inboard/board`).orderByChild(`keyCode`).equalTo(Vm.searchKey).once(`value`, (snapshot) => {
@@ -98,10 +119,14 @@ export default {
             firebase.database().ref(`users/inboard/user`).orderByChild(`uid`).equalTo(adminId).once(`value`, (snapshot) => {
               if (snapshot.val() !== null) {
                 let addKeyAdmin = Object.keys(snapshot.val())[0]
-                let dataTmp = snapshot.val()[addKeyAdmin].accept
-                let checkAccept = Object.keys(dataTmp).map(item => dataTmp[item].keyCode)
-                if (!checkAccept.find((item) => item === Vm.searchKey)) {
-                  firebase.database().ref(`users/inboard/user/${addKeyAdmin}`).child('accept').push({keyCode: Vm.searchKey, uid: Vm.local.id, status: 'true'})
+                let dataTmp = snapshot.val()[addKeyAdmin]
+                if (dataTmp && dataTmp.accept) {
+                  var checkAccept = Object.keys(dataTmp).map(item => dataTmp[item].keyCode)
+                  if (!checkAccept.find((item) => item === Vm.searchKey)) {
+                    firebase.database().ref(`users/inboard/user/${addKeyAdmin}`).child('accept').push({keyCode: Vm.searchKey, uid: Vm.local.id, status: true, time: new Date().getTime()})
+                  }
+                } else {
+                  firebase.database().ref(`users/inboard/user/${addKeyAdmin}`).child('accept').push({keyCode: Vm.searchKey, uid: Vm.local.id, status: true, time: new Date().getTime()})
                 }
               }
             })
@@ -172,8 +197,38 @@ export default {
         this.arrayKeyCode = Object.keys(vm.meAccount[key].keyCode).map(keys => vm.meAccount[key].keyCode[keys])
       }
     })
-    firebase.database().ref(`users/inboard/user`).child(`accept`).on(`child_changed`, (snapshot) => {
-      console.log(snapshot.val().accept)
+    firebase.database().ref(`users/inboard/user`).on(`child_changed`, (snapshot) => {
+      co(function *() {
+        let valueSort = snapshot.val().accept
+        let arrayIs = []
+        // yield any promise
+        yield Promise.resolve(Object.keys(valueSort).forEach((item) => {
+          console.log(valueSort[item])
+          arrayIs.push(valueSort[item])
+        }))
+        let sortDate = yield Promise.resolve(arrayIs.sort((a, b) => (b.time - a.time)))
+        return sortDate
+      }).then((resoponse) => {
+        if (resoponse[0].uid !== vm.local.id) {
+
+        }
+        console.log(resoponse)
+      }).catch((onerror) => {
+        console.log(onerror)
+      })
+      // console.log(valueSort)
+      if (snapshot.val() && snapshot.val().accept) {
+        swal({
+          title: 'ยืนยัน',
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!',
+          cancelButtonText: 'No, cancel!'
+        })
+        // console.log(snapshot.key)
+      }
     })
   }
 }
