@@ -149,10 +149,12 @@ export default {
       })
     },
     checkTeam (key) {
-      if (this.arrayKeyCode.find((item) => item === key)) {
-        return true
-      } else {
-        return false
+      if (key) {
+        if (this.arrayKeyCode.find((item) => item === key)) {
+          return true
+        } else {
+          return false
+        }
       }
     },
     logout () {
@@ -224,6 +226,14 @@ export default {
               cancelButtonText: 'No, cancel!'
             }).then((res) => {
               console.log(resoponse)
+              let addBoardUser = resoponse[0]
+              firebase.database().ref(`users/inboard/user`).orderByChild(`uid`).equalTo(addBoardUser.uid).once(`value`, (resUser) => {
+                if (snapshot.val() !== null) {
+                  let key = Object.keys(resUser.val())[0]
+                  console.log(key)
+                  firebase.database().ref(`users/inboard/user/${key}`).child('keyCode').push(addBoardUser.keyCode)
+                }
+              })
             }).catch((error) => {
               console.log(error)
             })
