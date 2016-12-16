@@ -1,13 +1,14 @@
 <template lang="html">
   <div class="app">
     <div class="body"></div>
-		<div class="grad"></div>
 		<div class="header">
-			<div>BEST<span>BOARDS </span></div>
+      <div class="content">
+        <div>BEST BOARDS </div>
+      </div>
 		</div>
 		<br>
 		<div class="login">
-				<input type="button" value="Login Facebook" @click="loginfacebook">
+				<input type="button" value="Login in with facebook" @click="loginfacebook">
 		</div>
   </div>
 </template>
@@ -52,7 +53,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="css" scoped>
 @import url(http://fonts.googleapis.com/css?family=Exo:100,200,400);
 @import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:700,400,300);
 
@@ -60,7 +61,6 @@ body{
 	margin: 0;
 	padding: 0;
 	background: #fff;
-
 	color: #fff;
 	font-family: Arial;
 	font-size: 12px;
@@ -74,48 +74,31 @@ body{
 	bottom: -40px;
 	width: auto;
 	height: auto;
-	background-image: url(http://ginva.com/wp-content/uploads/2012/07/city-skyline-wallpapers-008.jpg);
+  background-image: url(http://ginva.com/wp-content/uploads/2012/07/city-skyline-wallpapers-008.jpg);
 	background-size: cover;
 	-webkit-filter: blur(5px);
 	z-index: 0;
-}
-
-.grad{
-	position: absolute;
-	top: -20px;
-	left: -20px;
-	right: -40px;
-	bottom: -40px;
-	width: auto;
-	height: auto;
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.65))); /* Chrome,Safari4+ */
-	z-index: 1;
-	opacity: 0.7;
+  opacity: 0.6;
 }
 
 .header{
 	position: absolute;
-	top: calc(50% - 35px);
-	left: calc(50% - 255px);
-	z-index: 2;
+	top: calc(40% - 35px);
+	left: calc(57.5% - 255px);
 }
 
 .header div{
 	float: left;
 	color: #fff;
 	font-family: 'Exo', sans-serif;
-	font-size: 35px;
+	font-size: 40px;
 	font-weight: 200;
-}
-
-.header div span{
-	color: #5379fa !important;
 }
 
 .login{
 	position: absolute;
 	top: calc(50% - 75px);
-	left: calc(50% - 50px);
+	left: calc(40% - 40px);
 	height: 150px;
 	width: 350px;
 	padding: 30px;
@@ -125,11 +108,11 @@ body{
 .login input[type=button]{
 	width: 260px;
 	height: 35px;
-	background: #fff;
+	background: #49639F;
 	border: 1px solid #fff;
 	cursor: pointer;
 	border-radius: 2px;
-	color: #a18d6c;
+	color: #fff;
 	font-family: 'Exo', sans-serif;
 	font-size: 16px;
 	font-weight: 400;
@@ -148,13 +131,4 @@ body{
 .login input[type=button]:focus{
 	outline: none;
 }
-
-::-webkit-input-placeholder{
-   color: rgba(255,255,255,0.6);
-}
-
-::-moz-input-placeholder{
-   color: rgba(255,255,255,0.6);
-}
-
 </style>

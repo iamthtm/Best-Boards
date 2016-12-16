@@ -5,42 +5,40 @@
     <div class="main-container">
         <header class="block">
             <ul class="header-menu horizontal-list">
-                <li>
-                    <a class="header-menu-tab" href="#2"><span class="icon fontawesome-user scnd-font-color"></span>My Account</a>
-                </li>
-                <li>
-                  <input type="text" v-model="searchKey" v-on:keyup.enter="addKey()">
+                <li style="padding-left: 30px;padding-top: 10px;" class="titular">
+                    <a>Add Board<input type="text" v-model="searchKey" v-on:keyup.enter="addKey()"></a>
                 </li>
             </ul>
             <div class="profile-menu">
-                <p><a class="header-menu-tab" @click="logout"><span class="icon fontawesome-user scnd-font-color"></span>logout</a></p>
-                <div class="profile-picture small-profile-picture">
-                    <img width="40px" alt="Anne Hathaway picture" src="http://upload.wikimedia.org/wikipedia/commons/e/e1/Anne_Hathaway_Face.jpg">
-                </div> <!-- end profile-picture small-profile-picture -->
-            </div><!-- end profile-menu -->
+                <a class="header-menu-tab" @click="logout"><span class="icon fontawesome-user scnd-font-color"></span>logout</a>
+            </div>
         </header>
 
         <!-- LEFT-CONTAINER -->
         <div class="left-container container">
           <div class="profile block"> <!-- PROFILE (MIDDLE-CONTAINER) -->
-              <a class="add-button" href="#28"><span class="icon entypo-plus scnd-font-color"></span></a>
+              <br>
               <div class="profile-picture big-profile-picture clear">
                   <img width="150px" alt="Arunne Hathaway picture" :src="local.picture.data.url" >
               </div><!-- end profile-picture big-profile-picture clear -->
-              <h1 class="user-name">{{local.name}}</h1>
-              <div class="profile-description">
-                  <p class="scnd-font-color">Lorem ipsum dolor sit amet consectetuer adipiscing</p>
-              </div><!-- end profile-description-->
+              <h1 class="user-name " >{{local.name}}</h1>
+              <h2 class="user-name " >Email : {{local.email}}</h2>
+
           </div> <!-- end profile block-->
         </div><!-- end left-container container -->
-
         <!-- MIDDLE-CONTAINER -->
-        <div class="middle-container container" v-for="(list, key) in project" v-if="checkTeam(list.keyCode)">
-          <div class="join-newsletter block"> <!-- JOIN NEWSLETTER (RIGHT-CONTAINER) -->
-              <h2 class="titular">Project {{list.NameProject}} {{list.keyCode}}</h2>
-               <router-link class="subscribe button" :to="{ path: `/board/${key}` }">Board</router-link>
-               <button @click="deleteBorad(key)">Delete Board</button>
+        <div class="middle-container container" style="
+    width: 450px;">
+          <h2 class="titular">My Project</h2>
+          <div  v-for="(list, key) in project" v-if="checkTeam(list.keyCode)">
+            <div class="join-newsletter block"> <!-- JOIN NEWSLETTER (RIGHT-CONTAINER) -->
+              <a class="add-button" @click="deleteBorad(key)"><span class="icon entypo-plus scnd-font-color"></span></a>
+                <h2 class="titular">Project : {{list.NameProject}} | Key : {{list.keyCode}}</h2>
+                 <router-link class="subscribe button" :to="{ path: `/board/${key}` }">Board</router-link>
+                 <!-- <button @click="deleteBorad(key)">Delete Board</button> -->
+            </div>
           </div>
+
         </div><!-- end middle-container container -->
 
         <!-- RIGHT-CONTAINER -->
@@ -52,14 +50,6 @@
                 </div>
                 <a class="middle-subscribe button" @click="addProject(createProject)">Create</a>
             </div>
-              <div class="calendar-day block"> <!-- CALENDAR DAY (RIGHT-CONTAINER) -->
-                  <div class="arrow-btn-container">
-                      <a class="arrow-btn left" href="#200"><span class="icon fontawesome-angle-left"></span></a>
-                      <h2 class="titular">WEDNESDAY</h2>
-                      <a class="arrow-btn right" href="#201"><span class="icon fontawesome-angle-right"></span></a>
-                  </div>
-                      <p class="the-day">26</p>
-              </div>
           </div> <!-- end right-container -->
     </div> <!-- end main-container -->
  </div> <!-- end app  -->
@@ -249,31 +239,12 @@ export default {
 </script>
 
 
-<style>
+<style lang="css" >
 /************************************ FONTS ************************************/
-@import url(http://fonts.googleapis.com/css?family=Ubuntu:400,700);
 @import url(http://weloveiconfonts.com/api/?family=entypo|fontawesome|zocial);
-/* entypo */
-[class*="entypo-"]:before {
-  font-family: 'entypo', sans-serif;
-}
-/* fontawesome */
+
 [class*="fontawesome-"]:before {
   font-family: 'FontAwesome', sans-serif;
-}
-/* zocial */
-[class*="zocial-"]:before {
-  font-family: 'zocial', sans-serif;
-}
-@font-face {
-	font-family: 'icomoon';
-	src:url('http://jlalovi-cv.herokuapp.com/font/icomoon.eot');
-	src:url('http://jlalovi-cv.herokuapp.com/font/icomoon.eot?#iefix') format('embedded-opentype'),
-		url('http://jlalovi-cv.herokuapp.com/font/icomoon.ttf') format('truetype'),
-		url('http://jlalovi-cv.herokuapp.com/font/icomoon.woff') format('woff'),
-		url('http://jlalovi-cv.herokuapp.com/font/icomoon.svg#icomoon') format('svg');
-	font-weight: normal;
-	font-style: normal;
 }
 /************************************* END FONTS *************************************/
 
@@ -372,6 +343,7 @@ h1, h2, p, a, span{
 	text-align: center;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
+  font-family: 'Exo', sans-serif;
 }
 
 .button {
@@ -442,10 +414,11 @@ h1, h2, p, a, span{
       	}
   /** MAIN CONTAINER **/
 .main-container {
-  font-family: 'Ubuntu', sans-serif;
-  width: 950px;
+  /*font-family: 'Ubuntu', sans-serif;*/
   height: auto;
   margin: 6em auto;
+  width: 1100px;
+  margin-top: 0px
 }
 /*********************************************** HEADER ***********************************************/
 header {
@@ -454,6 +427,7 @@ header {
   .header-menu {
     font-size: 17px;
     line-height: 80px;
+    font-family: -webkit-body;
   }
     .header-menu li {
       position: relative;
@@ -466,6 +440,7 @@ header {
         font-size: 17px;
         -webkit-transition: background .3s;
         transition: background .3s;
+        font-family: 'Exo', sans-serif;
       }
         .header-menu-tab:hover {
           background: #50597b;
@@ -496,7 +471,7 @@ header {
   .profile-menu {
     float: right;
     height: 80px;
-    padding-right: 20px;
+    /*padding-right: 20px;*/
   }
     .profile-menu p {
       font-size: 17px;
@@ -543,9 +518,11 @@ header {
       }
       .middle-subscribe.button {
         background: #11a8ab;
+        font-family: 'Exo', sans-serif;
       }
       .middle-subscribe.button:hover {
           background: #0F9295;
+          font-family: 'Exo', sans-serif;
       }
       .profile {
         height: 410px;
@@ -563,10 +540,12 @@ header {
       .add-button .icon:hover {
         color: #e64c65;
         border-color: #e64c65;
+        font-family: 'Exo', sans-serif;
       }
     .user-name {
       margin: 25px 0 16px;
       text-align: center;
+      font-family: 'Exo', sans-serif;
     }
     .profile-description {
       width: 210px;
@@ -585,6 +564,7 @@ header {
 				.subscribe.button {
 					background: #11a8ab;
 					margin-top: 10px;
+          font-family: 'Exo', sans-serif;
 				}
 					.subscribe.button:hover {
 						background: #0F9295;
@@ -592,21 +572,6 @@ header {
 			.account {
 				height: 390px;
 			}
-      .calendar-day {
-        height: auto;
-        background: #3468af;
-      }
-        .calendar-day .titular {
-          background: #001c42;
-        }
-        .calendar-day .arrow-btn:hover {
-          background: #16417E;
-        }
-        .calendar-day .the-day {
-          margin: 0;
-          text-align: center;
-          font-size: 146px;
-        }
         .arrow-btn-container {
       	  position: relative;
         }
