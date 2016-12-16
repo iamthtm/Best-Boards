@@ -13,7 +13,7 @@
   <input type="text" v-model="nameBorad">
   <button @click="createboard(nameBorad)">Create</button>
   <div v-for="(item, key) in board">
-    <p>{{item.nameBorad}} {{item.keyCode}}<br>
+    <p>{{item.nameBorad}} <button @click="editBoard(key, item)">Edit</button><br>
       <div v-for="(list, keytask) in item.task">
         {{list}}
         <button @click="deleteTask(key, keytask)">Delete</button>
@@ -51,6 +51,18 @@ export default {
     })
   },
   methods: {
+    editBoard (key, item) {
+      let Vm = this
+      swal({
+        title: 'dasdsad',
+        input: 'textarea',
+        inputValue: item.nameBorad,
+        showCancelButton: true
+      }).then(function (text) {
+        swal(text)
+        Vm.boardNow.child(`detailboard/${key}`).update({nameBorad: text})
+      })
+    },
     updateTask (key, keytask, data) {
       let Vm = this
       swal({
